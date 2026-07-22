@@ -1,7 +1,8 @@
 use axum::Router;
+use axum_embed::ServeEmbed;
 use tokio::net::TcpListener;
 use tower_http::trace::TraceLayer;
-use wandu::{AppState, config::Config, database, routes};
+use wandu::{AppState, assets::Assets, config::Config, database, routes};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -19,6 +20,7 @@ async fn main() -> anyhow::Result<()> {
 
     let app = Router::new()
         .nest("/api", routes::router())
+        .fallback_service(ServeEmbed::<Assets>::new())
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 
