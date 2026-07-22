@@ -7,19 +7,19 @@ use serde::Serialize;
 
 #[derive(Debug, thiserror::Error)]
 pub enum AppError {
-    #[error("Not found")]
+    #[error("not found")]
     NotFound,
 
-    #[error("Bad request: {0}")]
+    #[error("bad request: {0}")]
     BadRequest(String),
 
-    #[error("Unauthorized")]
+    #[error("unauthorized")]
     Unauthorized,
 
-    #[error("Database error: {0}")]
+    #[error("database error: {0}")]
     Database(#[from] sqlx::Error),
 
-    #[error("Internal server error")]
+    #[error("internal server error")]
     Internal(#[from] anyhow::Error),
 }
 
@@ -56,13 +56,13 @@ impl IntoResponse for AppError {
         let status = self.status_code();
 
         match &self {
-            AppError::Database(e) => tracing::error!("Database error: {:?}", e),
-            AppError::Internal(e) => tracing::error!("Internal error: {:?}", e),
-            _ => tracing::warn!("Request error: {}", self),
+            AppError::Database(e) => tracing::error!("database error: {:?}", e),
+            AppError::Internal(e) => tracing::error!("internal error: {:?}", e),
+            _ => tracing::warn!("request error: {}", self),
         }
 
         let message = match status {
-            StatusCode::INTERNAL_SERVER_ERROR => "Internal server error".to_string(),
+            StatusCode::INTERNAL_SERVER_ERROR => "internal server error".to_string(),
             _ => self.to_string(),
         };
 
