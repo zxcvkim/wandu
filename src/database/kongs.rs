@@ -112,13 +112,14 @@ pub async fn count(pool: &SqlitePool) -> QueryResult<i64> {
 pub async fn update(
     pool: &SqlitePool,
     id: KongId,
-    profile: &str,
-    content: &str,
+    profile: Option<&str>,
+    content: Option<&str>,
 ) -> QueryResult<bool> {
     let result = sqlx::query!(
         r#"
             UPDATE kongs
-            SET profile = ?, content = ?
+            SET profile = COALESCE(?, profile),
+                content = COALESCE(?, content)
             WHERE id = ?
         "#,
         profile,
